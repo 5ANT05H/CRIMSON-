@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>CRIMSON⁴⁰⁴ | Real-Time Esports Network</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 20% 30%, #0a0a0f, #030105);
+      min-height: 100vh;
+      color: #e0e0ff;
+    }
+
+    /* Cyberpunk glassmorphism */
+    .glass-panel {
+      background: rgba(10, 8, 20, 0.65);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 45, 85, 0.4);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 30, 70, 0.2);
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f0c1a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ff2d55;
+      border-radius: 10px;
+    }
+
+    button, .clickable {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    input, textarea {
+      background: #0d0b16;
+      border: 1px solid #2a1e3a;
+      color: #f0eefc;
+      border-radius: 40px;
+      padding: 12px 18px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #ff2d55;
+      box-shadow: 0 0 8px #ff2d5580;
+    }
+
+    /* main layout */
+    .app-container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* sidebar */
+    .sidebar {
+      width: 280px;
+      background: rgba(5, 3, 12, 0.85);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid #ff2d5533;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s;
+    }
+
+    .logo-area {
+      padding: 24px 20px;
+      border-bottom: 1px solid #ff2d5533;
+      font-weight: 800;
+      font-size: 1.8rem;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ff2d55, #ff6a4b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 8px #ff2d5580;
+    }
+
+    .online-users-title {
+      padding: 16px 20px;
+      font-weight: 600;
+      color: #ffb347;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    .users-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 12px;
+    }
+
+    .user-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      margin-bottom: 6px;
+      background: rgba(255, 45, 85, 0.05);
+      transition: 0.1s;
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #2a1e3a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 0 0 2px #2a1e3a;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .user-badge {
+      font-size: 0.7rem;
+      color: #ffb347;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2ecc71;
+      box-shadow: 0 0 4px #2ecc71;
+    }
+
+    .status-idle {
+      background: #f39c12;
+    }
+
+    /* main chat */
+    .main-chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 18px 24px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #ff2d5533;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .messages-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .message-bubble {
+      max-width: 80%;
+      padding: 10px 16px;
+      border-radius: 20px;
+      background: rgba(20, 15, 35, 0.9);
+      border-left: 3px solid #ff2d55;
+      align-self: flex-start;
+    }
+
+    .my-message {
+      align-self: flex-end;
+      background: rgba(255, 45, 85, 0.2);
+      border-left: 3px solid #ffaa44;
+    }
+
+    .message-meta {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .typing-indicator {
+      padding: 5px 20px;
+      font-size: 0.8rem;
+      font-style: italic;
+      color: #ffaa66;
+    }
+
+    .chat-input-area {
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.5);
+      border-top: 1px solid #ff2d5533;
+      display: flex;
+      gap: 12px;
+    }
+
+    .chat-input-area input {
+      flex: 1;
+    }
+
+    /* right panel (leaderboard) */
+    .right-panel {
+      width: 280px;
+      background: rgba(5, 3, 12, 0.75);
+      backdrop-filter: blur(12px);
+      border-left: 1px solid #ff2d5533;
+      padding: 20px 12px;
+      overflow-y: auto;
+    }
+
+    .badge-role {
+      background: #ff2d5522;
+      border-radius: 40px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+    }
+
+    /* admin modal */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      width: 90%;
+      max-width: 500px;
+      background: #0f0c1a;
+      border-radius: 32px;
+      padding: 24px;
+      border: 1px solid #ff2d55;
+    }
+
+    .toast-notification {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1a1528;
+      border-left: 5px solid #ff2d55;
+      padding: 12px 20px;
+      border-radius: 12px;
+      z-index: 1100;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    @media (max-width: 800px) {
+      .sidebar, .right-panel {
+        display: none;
+      }
+      .app-container {
+        flex-direction: column;
+      }
+      .main-chat {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+  // ======================== FAKE REAL-TIME DB (localStorage + polling) ========================
+  const STORAGE_KEYS = {
+    USERS: 'crimson_users',
+    MESSAGES: 'crimson_messages',
+    PRESENCE: 'crimson_presence',
+    SESSIONS: 'crimson_sessions',
+    XP: 'crimson_xp'
+  };
+
+  // Helper: seed initial data
+  function seedData() {
+    if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
+      const initialUsers = [
+        { uid: "owner1", username: "CrimsonHead", email: "owner@crimson.com", role: "Head Owner", createdAt: Date.now(), lastLogin: Date.now(), xp: 5000 },
+        { uid: "admin1", username: "NeonAdmin", email: "admin@crimson.com", role: "Admin", createdAt: Date.now(), lastLogin: Date.now(), xp: 2500 },
+        { uid: "premium1", username: "RazorBlade", email: "premium@crimson.com", role: "Premium", createdAt: Date.now(), lastLogin: Date.now(), xp: 800 },
+        { uid: "member1", username: "ShadowWolf", email: "member@crimson.com", role: "Member", createdAt: Date.now(), lastLogin: Date.now(), xp: 120 }
+      ];
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(initialUsers));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.MESSAGES)) {
+      localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.PRESENCE)) {
+      localStorage.setItem(STORAGE_KEYS.PRESENCE, JSON.stringify({}));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.XP)) {
+      localStorage.setItem(STORAGE_KEYS.XP, JSON.stringify({}));
+    }
+  }
+  seedData();
+
+  // helpers
+  function getUsers() { return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || []; }
+  function saveUsers(users) { localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users)); }
+  function getMessages() { return JSON.parse(localStorage.getItem(STORAGE_KEYS.MESSAGES)) || []; }
+  function saveMessages(msgs) { localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(msgs)); }
+  function getPresence() { return JSON.parse(localStorage.getItem(STORAGE_KEYS.PRESENCE)) || {}; }
+  function savePresence(pres) { localStorage.setItem(STORAGE_KEYS.PRESENCE, JSON.stringify(pres)); }
+
+  // XP & rank
+  function getRankFromXP(xp) {
+    if (xp >= 5000) return "Legend";
+    if (xp >= 2500) return "Elite";
+    if (xp >= 1000) return "Diamond";
+    if (xp >= 500) return "Gold";
+    if (xp >= 200) return "Silver";
+    return "Bronze";
+  }
+
+  // realtime event listeners (simulate pub/sub)
+  let messageListeners = [];
+  let presenceListeners = [];
+  let announceListeners = [];
+
+  function emitMessagesUpdate() { messageListeners.forEach(fn => fn(getMessages())); }
+  function emitPresenceUpdate() { presenceListeners.forEach(fn => fn(getPresence())); }
+
+  function addMessage(msg) {
+    const msgs = getMessages();
+    msgs.push(msg);
+    saveMessages(msgs);
+    emitMessagesUpdate();
+    return msg;
+  }
+
+  function updatePresence(uid, status) {
+    const pres = getPresence();
+    pres[uid] = { uid, status, lastSeen: Date.now() };
+    savePresence(pres);
+    emitPresenceUpdate();
+  }
+
+  // Polling simulation for presence
+  setInterval(() => {
+    const currentUser = getLoggedInUser();
+    if (currentUser) {
+      updatePresence(currentUser.uid, "online");
+    }
+    // also mark offline after inactivity simulation? we set offline on logout
+  }, 15000);
+
+  // session mgmt
+  function getLoggedInUser() {
+    const sess = localStorage.getItem(STORAGE_KEYS.SESSIONS);
+    if (!sess) return null;
+    const { uid } = JSON.parse(sess);
+    const users = getUsers();
+    return users.find(u => u.uid === uid) || null;
+  }
+
+  function loginUser(uid) {
+    const users = getUsers();
+    const user = users.find(u => u.uid === uid);
+    if (user) {
+      user.lastLogin = Date.now();
+      saveUsers(users);
+      localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify({ uid }));
+      updatePresence(uid, "online");
+      return true;
+    }
+    return false;
+  }
+
+  function logout() {
+    const user = getLoggedInUser();
+    if (user) {
+      updatePresence(user.uid, "offline");
+    }
+    localStorage.removeItem(STORAGE_KEYS.SESSIONS);
+    window.location.reload();
+  }
+
+  // permission check: HeadOwner can't DM Members, Members cannot DM HeadOwner
+  function canSendDirectMessage(sender, receiver) {
+    if (sender.role === "Head Owner" && receiver.role === "Member") return false;
+    if (sender.role === "Member" && receiver.role === "Head Owner") return false;
+    return true;
+  }
+
+  // add XP
+  function addXP(uid, amount) {
+    const users = getUsers();
+    const idx = users.findIndex(u => u.uid === uid);
+    if (idx !== -1) {
+      users[idx].xp = (users[idx].xp || 0) + amount;
+      saveUsers(users);
+      return true;
+    }
+    return false;
+  }
+
+  // simulate premium instant vs member delay (announcements)
+  function sendAnnouncement(announcement, senderRole) {
+    if (senderRole !== "Owner" && senderRole !== "Head Owner" && senderRole !== "Admin") return;
+    const allUsers = getUsers();
+    const premiumUsers = allUsers.filter(u => u.role === "Premium");
+    const memberUsers = allUsers.filter(u => u.role === "Member");
+    premiumUsers.forEach(u => {
+      showToast(`📢 ANNOUNCEMENT: ${announcement}`, "announcement");
+    });
+    memberUsers.forEach(u => {
+      setTimeout(() => {
+        showToast(`📢 (Delayed) Announcement: ${announcement}`, "announcement");
+      }, 10000);
+    });
+    // also broadcast to chat system announcement channel
+    const sysMsg = {
+      id: Date.now() + "-ann",
+      senderId: "system",
+      senderName: "🔥 SYSTEM",
+      message: `🚨 ANNOUNCEMENT: ${announcement}`,
+      timestamp: Date.now(),
+      roleBadge: "System",
+      roomId: "global"
+    };
+    addMessage(sysMsg);
+  }
+
+  // toast
+  let toastTimeout;
+  function showToast(msg, type = "info") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = "toast-notification";
+    toast.innerHTML = `<i class="fas fa-bell"></i> ${msg}`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+  }
+
+  // Role based badge style
+  function getRoleColor(role) {
+    switch(role) {
+      case "Head Owner": return "#ff3366";
+      case "Owner": return "#ff6633";
+      case "Admin": return "#33aaff";
+      case "Premium": return "#ffaa33";
+      default: return "#88aaff";
+    }
+  }
+
+  // Initialize UI App
+  function renderApp() {
+    const user = getLoggedInUser();
+    if (!user) {
+      renderAuthScreen();
+      return;
+    }
+    renderDashboard(user);
+  }
+
+  function renderAuthScreen() {
+    const root = document.getElementById("root");
+    root.innerHTML = `
+      <div style="display:flex; justify-content:center; align-items:center; min-height:100vh; padding:1rem;">
+        <div class="glass-panel" style="width:100%; max-width:420px; padding:32px;">
+          <h2 style="text-align:center; margin-bottom:24px;">⚡ CRIMSON⁴⁰⁴ ⚡</h2>
+          <div id="auth-tabs" style="display:flex; gap:12px; margin-bottom:24px;">
+            <button id="login-tab-btn" style="flex:1; background:#ff2d55; border:none; padding:10px; border-radius:60px;">LOGIN</button>
+            <button id="signup-tab-btn" style="flex:1; background:#2a1e3a; border:none; padding:10px; border-radius:60px;">SIGNUP</button>
+          </div>
+          <div id="auth-form-container"></div>
+        </div>
+      </div>
+    `;
+    let mode = "login";
+    function renderForm() {
+      const container = document.getElementById("auth-form-container");
+      if (mode === "login") {
+        container.innerHTML = `
+          <input type="email" id="login-email" placeholder="Email" style="width:100%; margin-bottom:16px;" />
+          <input type="password" id="login-password" placeholder="Password" style="width:100%; margin-bottom:24px;" />
+          <button id="do-login" style="width:100%; background:#ff2d55; border:none; padding:12px; border-radius:60px; font-weight:bold;">ENTER NETWORK</button>
+        `;
+        document.getElementById("do-login")?.addEventListener("click", () => {
+          const email = document.getElementById("login-email").value.trim();
+          const pwd = document.getElementById("login-password").value;
+          const users = getUsers();
+          const found = users.find(u => u.email === email && pwd === "crimson404"); // simple demo auth
+          if (found) {
+            loginUser(found.uid);
+            renderApp();
+          } else {
+            alert("Invalid credentials (use any email, password = 'crimson404' OR pre-seeded users: owner@crimson.com / any password)");
+          }
+        });
+      } else {
+        container.innerHTML = `
+          <input type="text" id="signup-username" placeholder="Username" style="width:100%; margin-bottom:16px;" />
+          <input type="email" id="signup-email" placeholder="Email" style="width:100%; margin-bottom:16px;" />
+          <input type="password" id="signup-password" placeholder="Password" style="width:100%; margin-bottom:24px;" />
+          <button id="do-signup" style="width:100%; background:#ff2d55; border:none; padding:12px; border-radius:60px;">CREATE ACCOUNT</button>
+        `;
+        document.getElementById("do-signup")?.addEventListener("click", () => {
+          const username = document.getElementById("signup-username").value.trim();
+          const email = document.getElementById("signup-email").value.trim();
+          if (!username || !email) return alert("Fill all");
+          const users = getUsers();
+          if (users.some(u => u.email === email)) return alert("Email exists");
+          const newUid = "uid_" + Date.now() + "_" + Math.floor(Math.random()*10000);
+          const newUser = { uid: newUid, username, email, role: "Member", createdAt: Date.now(), lastLogin: Date.now(), xp: 0 };
+          users.push(newUser);
+          saveUsers(users);
+          loginUser(newUid);
+          renderApp();
+        });
+      }
+    }
+    document.getElementById("login-tab-btn")?.addEventListener("click", () => { mode="login"; renderForm(); });
+    document.getElementById("signup-tab-btn")?.addEventListener("click", () => { mode="signup"; renderForm(); });
+    renderForm();
+  }
+
+  function renderDashboard(user) {
+    const root = document.getElementById("root");
+    root.innerHTML = `
+      <div class="app-container">
+        <div class="sidebar glass-panel" style="border-radius:0;">
+          <div class="logo-area">CRIMSON⁴⁰⁴</div>
+          <div class="online-users-title"><i class="fas fa-circle" style="color:#2ecc71; font-size:10px;"></i> ONLINE — <span id="online-count">0</span></div>
+          <div class="users-list" id="users-list-container"></div>
+          <div style="padding:20px;">
+            <button id="logout-btn" style="background:#ff2d5533; border:1px solid #ff2d55; width:100%; padding:8px; border-radius:40px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+          </div>
+        </div>
+        <div class="main-chat">
+          <div class="chat-header">
+            <div><i class="fas fa-hashtag"></i> #global-chat</div>
+            <div><span class="badge-role">${user.role.toUpperCase()}</span> ${user.username}</div>
+          </div>
+          <div class="messages-area" id="messages-area"></div>
+          <div id="typing-indicator" class="typing-indicator"></div>
+          <div class="chat-input-area">
+            <input type="text" id="message-input" placeholder="Type message...">
+            <button id="send-global" style="background:#ff2d55; border:none; padding:0 24px; border-radius:40px;"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+        <div class="right-panel">
+          <h4><i class="fas fa-trophy"></i> LEADERBOARD</h4>
+          <div id="leaderboard-list" style="margin-top:16px;"></div>
+          ${user.role === "Owner" || user.role === "Head Owner" ? `<button id="admin-panel-btn" style="margin-top:20px; width:100%; background:#ffaa33; border:none; padding:8px; border-radius:40px;"><i class="fas fa-crown"></i> OWNER PANEL</button>` : ''}
+          <div style="margin-top:20px;"><hr><p style="font-size:0.7rem; margin-top:12px;">💰 XP: ${user.xp || 0} | Rank: ${getRankFromXP(user.xp || 0)}</p></div>
+        </div>
+      </div>
+      <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:999;"></div>
+    `;
+    // dynamic updates
+    const messagesArea = document.getElementById("messages-area");
+    const usersListDiv = document.getElementById("users-list-container");
+    const leaderboardDiv = document.getElementById("leaderboard-list");
+    const onlineCountSpan = document.getElementById("online-count");
+    const typingDiv = document.getElementById("typing-indicator");
+    let typingTimeout = null;
+
+    function refreshUsersList() {
+      const allUsers = getUsers();
+      const presence = getPresence();
+      const onlineUsers = allUsers.filter(u => presence[u.uid] && presence[u.uid].status === "online");
+      onlineCountSpan.innerText = onlineUsers.length;
+      usersListDiv.innerHTML = onlineUsers.map(u => `
+        <div class="user-item" data-uid="${u.uid}">
+          <div class="user-avatar">${u.username.charAt(0).toUpperCase()}</div>
+          <div class="user-info">
+            <div class="user-name">${u.username} <span class="user-badge">${u.role}</span></div>
+            <div style="display:flex; gap:8px;"><span class="status-dot"></span> online</div>
+          </div>
+          <button class="dm-user-btn" data-uid="${u.uid}" data-name="${u.username}" style="background:none; bor
